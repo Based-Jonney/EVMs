@@ -1,0 +1,14 @@
+name = "evms-gtd-proxy"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+# Set the real Google Form ID (from the form's share/edit URL:
+# https://docs.google.com/forms/d/e/<THIS_ID>/viewform) before deploying.
+[vars]
+GOOGLE_FORM_ID = "YOUR_GOOGLE_FORM_ID_HERE"
+
+# Create with: wrangler kv:namespace create APPLICANTS
+# then paste the returned id below.
+[[kv_namespaces]]
+binding = "APPLICANTS"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
