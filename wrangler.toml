@@ -11,4 +11,4 @@ GOOGLE_FORM_ID = "YOUR_GOOGLE_FORM_ID_HERE"
 # then paste the returned id below.
 [[kv_namespaces]]
 binding = "APPLICANTS"
-id = "YOUR_KV_NAMESPACE_ID_HERE"
+id = "cadfed9f7513471fb98f7bcae6972099"
