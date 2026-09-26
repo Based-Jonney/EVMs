@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EVMs — 10,000 Ethereum Wallet Identities</title>
+<meta name="description" content="EVMs is a collection of 10,000 deterministic Ethereum wallet-style identities inspired by the visual language of EVM address identicons.">
+
+<meta property="og:title" content="EVMs — 10,000 Ethereum Wallet Identities">
+<meta property="og:description" content="EVMs is a collection of 10,000 deterministic Ethereum wallet-style identities inspired by the visual language of EVM address identicons.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://REPLACE_WITH_DEPLOYED_DOMAIN/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EVMs — 10,000 Ethereum Wallet Identities">
+<meta name="twitter:description" content="10,000 deterministic Ethereum wallet-style identities.">
+<meta name="twitter:image" content="https://REPLACE_WITH_DEPLOYED_DOMAIN/og-image.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #06070a;
+  --bg-elev: #0b0d13;
+  --line: rgba(255,255,255,0.08);
+  --text: #eef0f5;
+  --text-dim: #8a8fa3;
+  --text-faint: #565b70;
+  --eth-blue: #627EEA;
+  --violet: #8b7bff;
+  --cyan: #5ee7ff;
+  --green: #3ddc84;
+  --radius: 14px;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--display);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+.mono { font-family: var(--mono); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+section { position: relative; padding: 120px 0; }
+@media (max-width: 720px) { section { padding: 72px 0; } }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
+  color: var(--cyan); text-transform: uppercase; margin-bottom: 18px;
+}
+.eyebrow::before { content: ''; width: 6px; height: 6px; background: var(--cyan); display: inline-block; }
+
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.02em; }
+h2 { font-size: clamp(28px, 4vw, 44px); margin-bottom: 20px; }
+p.lead { color: var(--text-dim); font-size: 17px; max-width: 640px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 14px 26px; border-radius: 999px; border: 1px solid var(--line);
+  cursor: pointer; transition: all .18s ease; background: transparent; color: var(--text);
+  white-space: nowrap;
+}
+.btn-primary { background: linear-gradient(135deg, var(--eth-blue), var(--violet)); border-color: transparent; color: #fff; box-shadow: 0 0 0 rgba(98,126,234,0); }
+.btn-primary:hover { box-shadow: 0 8px 30px rgba(98,126,234,0.35); transform: translateY(-1px); }
+.btn-ghost:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
+.btn-wallet { background: var(--bg-elev); border: 1px solid var(--line); }
+.btn-wallet.connected { border-color: rgba(61,220,132,0.4); color: var(--green); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* NAV */
+header.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  backdrop-filter: blur(14px); background: rgba(6,7,10,0.72);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1180px; margin: 0 auto; }
+.logo { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+.logo .dot { color: var(--cyan); }
+.nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--text-dim); }
+.nav-links a:hover { color: var(--text); }
+.nav-cta { display: flex; gap: 10px; align-items: center; }
+.nav-toggle { display: none; }
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: block; }
+}
+.mobile-menu {
+  display: none; position: fixed; inset: 0; z-index: 99; background: rgba(6,7,10,0.98);
+  padding: 100px 24px 24px; flex-direction: column; gap: 22px; font-size: 20px;
+}
+.mobile-menu.open { display: flex; }
+
+/* HERO */
+.hero {
+  min-height: 100svh; display: flex; align-items: center; position: relative;
+  padding-top: 100px; overflow: hidden;
+}
+.hero-grid-bg {
+  position: absolute; inset: 0; z-index: 0; opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(98,126,234,0.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(98,126,234,0.10) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 35%, black 10%, transparent 75%);
+}
+.hero-glow {
+  position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 900px; border-radius: 50%; z-index: 0;
+  background: radial-gradient(circle, rgba(98,126,234,0.22), transparent 60%);
+  filter: blur(10px);
+}
+.floating-cells { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.fcell {
+  position: absolute; border-radius: 4px; opacity: 0.5;
+  animation: drift 14s ease-in-out infinite;
+}
+@keyframes drift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-22px) rotate(6deg); }
+}
+.hero-content { position: relative; z-index: 2; text-align: center; width: 100%; }
+.hero-title {
+  font-size: clamp(56px, 11vw, 128px); font-weight: 700; letter-spacing: -0.04em; line-height: 0.95;
+  background: linear-gradient(135deg, #fff 40%, var(--cyan));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero-sub { font-family: var(--mono); font-size: clamp(14px, 2vw, 18px); color: var(--text-dim); margin-top: 22px; letter-spacing: 0.02em; }
+.hero-desc { max-width: 560px; margin: 18px auto 0; color: var(--text-faint); font-size: 15px; }
+.hero-addr {
+  margin: 44px auto 0; display: inline-block; font-family: var(--mono);
+  font-size: clamp(20px, 4vw, 34px); color: var(--text); padding: 18px 30px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,0.02);
+  letter-spacing: 0.02em;
+}
+.hero-addr .fade { color: var(--text-faint); }
+.hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
+
+/* STATS / COLLECTION */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-top: 56px; }
+@media (max-width: 720px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+.stat-card { background: var(--bg-elev); padding: 32px 20px; text-align: center; }
+.stat-num { font-family: var(--mono); font-size: 26px; color: var(--cyan); font-weight: 700; }
+.stat-label { font-size: 11px; letter-spacing: 0.1em; color: var(--text-faint); margin-top: 8px; text-transform: uppercase; }
+
+/* LORE */
+.lore { background: var(--bg-elev); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.lore-lines p { font-family: var(--display); font-size: clamp(20px, 3vw, 30px); color: var(--text-dim); margin-bottom: 6px; }
+.lore-lines p:last-child { color: var(--text); }
+.lore-body { margin-top: 32px; max-width: 620px; color: var(--text-dim); font-size: 15.5px; }
+.lore-body p { margin-bottom: 14px; }
+
+/* GALLERY */
+.g-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 36px; }
+.g-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+@media (max-width: 960px) { .g-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 560px) { .g-grid { grid-template-columns: repeat(2, 1fr); } }
+.g-card {
+  position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--line);
+  background: var(--bg-elev); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.g-card img { width: 100%; height: auto; image-rendering: pixelated; }
+.g-card:hover { transform: translateY(-3px); border-color: rgba(98,126,234,0.5); box-shadow: 0 10px 30px rgba(98,126,234,0.15); }
+.g-card figcaption {
+  position: absolute; inset: auto 0 0 0; padding: 10px 12px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85), transparent);
+  display: flex; justify-content: space-between; align-items: center;
+  opacity: 0; transform: translateY(6px); transition: all .2s ease;
+}
+.g-card:hover figcaption { opacity: 1; transform: translateY(0); }
+.g-id { font-family: var(--mono); font-size: 11px; font-weight: 700; }
+.g-addr { font-family: var(--mono); font-size: 10px; color: var(--cyan); }
+.g-foot { text-align: center; margin-top: 40px; }
+
+/* IDENTITY FLOW */
+.flow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.flow-step {
+  width: 100%; max-width: 520px; text-align: center; padding: 22px; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--bg-elev); opacity: 0.3; transform: translateY(10px);
+  transition: all .5s ease;
+}
+.flow-step.active { opacity: 1; transform: translateY(0); border-color: rgba(98,126,234,0.4); }
+.flow-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--text-faint); text-transform: uppercase; margin-bottom: 10px; }
+.flow-value { font-family: var(--mono); font-size: clamp(13px, 2.4vw, 18px); word-break: break-all; }
+.flow-arrow { font-family: var(--mono); color: var(--text-faint); font-size: 22px; margin: 14px 0; }
+.flow-icon-box { width: 96px; height: 96px; margin: 0 auto; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+.flow-icon-box img { width: 100%; height: 100%; image-rendering: pixelated; }
+
+/* GTD */
+.gtd-panel {
+  max-width: 560px; margin: 0 auto; padding: 40px; border-radius: var(--radius);
+  border: 1px solid var(--line); background: linear-gradient(180deg, rgba(98,126,234,0.06), transparent);
+}
+.field { margin-bottom: 18px; text-align: left; }
+.field label { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
+.field input {
+  width: 100%; padding: 13px 14px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 14px;
+}
+.field input:focus { outline: none; border-color: var(--eth-blue); }
+.field input:disabled { opacity: 0.6; }
+.wallet-pill {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 12px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg);
+  font-family: var(--mono); font-size: 13px; margin-bottom: 18px;
+}
+.wallet-pill .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); display: inline-block; margin-right: 8px; }
+.wallet-pill.connected .status-dot { background: var(--green); }
+.form-note { font-size: 12px; color: var(--text-faint); margin-top: 14px; line-height: 1.6; }
+.success-box {
+  text-align: center; padding: 30px 10px; display: none;
+}
+.success-box.show { display: block; }
+.success-icon {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 18px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(61,220,132,0.12); border: 1px solid rgba(61,220,132,0.4); color: var(--green); font-size: 28px;
+}
+.gtd-error { color: #ff8080; font-size: 13px; margin-top: 12px; display: none; }
+.gtd-error.show { display: block; }
+
+/* FAQ */
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-q { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; cursor: pointer; font-weight: 500; }
+.faq-q .plus { font-family: var(--mono); color: var(--text-faint); transition: transform .2s ease; }
+.faq-item.open .plus { transform: rotate(45deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height .25s ease; color: var(--text-dim); font-size: 14.5px; }
+.faq-item.open .faq-a { max-height: 220px; padding-bottom: 20px; }
+
+/* CONTRACT */
+.contract-box {
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elev);
+  padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
+@media (max-width: 640px) { .contract-box { grid-template-columns: 1fr; } }
+.contract-row dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--text-faint); text-transform: uppercase; margin-bottom: 6px; }
+.contract-row dd { font-family: var(--mono); font-size: 14px; word-break: break-all; }
+.copy-row { display: flex; align-items: center; gap: 10px; }
+.copy-btn { font-family: var(--mono); font-size: 11px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); cursor: pointer; background: transparent; color: var(--text-dim); }
+.copy-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+.contract-ctas { display: flex; gap: 10px; margin-top: 22px; grid-column: 1 / -1; flex-wrap: wrap; }
+
+/* FINAL CTA */
+.final-cta { text-align: center; }
+.final-cta h2 { margin-bottom: 8px; }
+
+footer { border-top: 1px solid var(--line); padding: 56px 0 32px; }
+.footer-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 32px; }
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--text-dim); }
+.footer-links a:hover { color: var(--text); }
+.footer-meta { margin-top: 40px; font-size: 12px; color: var(--text-faint); font-family: var(--mono); }
+
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="logo">EVM<span class="dot">s</span></div>
+    <nav class="nav-links">
+      <a href="#collection">Collection</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#gtd">GTD</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contract">Contract</a>
+    </nav>
+    <div class="nav-cta">
+      <button class="btn btn-wallet mono" id="walletBtnNav">Connect Wallet</button>
+      <button class="nav-toggle btn btn-ghost" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#collection">Collection</a>
+  <a href="#gallery">Gallery</a>
+  <a href="#gtd">GTD</a>
+  <a href="#faq">FAQ</a>
+  <a href="#contract">Contract</a>
+  <a href="https://opensea.io/collection/evms-" target="_blank" rel="noopener">OpenSea ↗</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="floating-cells" id="floatingCells"></div>
+  <div class="wrap hero-content">
+    <div class="eyebrow">Ethereum · 10,000 Supply</div>
+    <h1 class="hero-title">EVMS</h1>
+    <div class="hero-sub">10,000 ETHEREUM WALLET IDENTITIES</div>
+    <p class="hero-desc">A collection of deterministic wallet-style identities built from the visual language of Ethereum addresses.</p>
+    <div class="hero-addr mono"><span class="fade">0x8e30</span>...<span class="fade">7674</span></div>
+    <div class="hero-ctas">
+      <a href="#gallery" class="btn btn-primary">Explore Collection</a>
+      <a href="#gtd" class="btn btn-ghost">Apply for GTD</a>
+      <button class="btn btn-wallet" id="walletBtnHero">Connect Wallet</button>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION -->
+<section id="collection">
+  <div class="wrap reveal">
+    <div class="eyebrow">The Collection</div>
+    <h2>THE COLLECTION</h2>
+    <p class="lead">EVMs is a collection of 10,000 deterministic Ethereum wallet-style identities. Each piece is generated through a fixed Blockies-style algorithm using a deterministic seed — the same seed always produces the same identity. The visual system is built around the recognizable structure of Ethereum/EVM wallet identicons: grid-based cells, deterministic colors, and mirrored patterns.</p>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">10,000</div><div class="stat-label">Total Supply</div></div>
+      <div class="stat-card"><div class="stat-num">ETHEREUM</div><div class="stat-label">Network</div></div>
+      <div class="stat-card"><div class="stat-num">1 / 1</div><div class="stat-label">Unique Identities</div></div>
+      <div class="stat-card"><div class="stat-num">EVM</div><div class="stat-label">Wallet Culture</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LORE -->
+<section class="lore">
+  <div class="wrap reveal">
+    <div class="eyebrow">Lore</div>
+    <div class="lore-lines">
+      <p>Every wallet has an address.</p>
+      <p>Every address has an identity.</p>
+      <p>EVMs turns that invisible identity into something you can see.</p>
+    </div>
+    <div class="lore-body">
+      <p>An Ethereum address is a string most people recognize but never actually look at — forty characters, memorized only as a shape: the first few, the last few, everything else abstracted away.</p>
+      <p>EVMs takes that abstraction and makes it visible. Each identity is derived deterministically from its seed — nothing hand-designed, nothing arbitrary. The collection isn't about individual characters. It's about the identity behind the address.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="wrap reveal">
+    <div class="g-head">
+      <div>
+        <div class="eyebrow">Selected Identities</div>
+        <h2 style="margin-bottom:0">GALLERY</h2>
+      </div>
+      <p class="lead" style="margin:0; font-size:14px;">Showing 40 of 10,000 identities.</p>
+    </div>
+    <div class="g-grid">
+
+        <figure class="g-card" data-id="0">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACT0lEQVR42u3csY3CQBBAURs5oQHHtEB4VVCFEyJLVEAHG90FpBSAqyCEOqji4guRZsT69r0CRpj92s2mP193XahxKl2012UOn5nxO+v/8FWczqaDyogSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBK+GMIn5ixYoWmTsdNiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUcJb4ncJjVMJn2k/UVOn46bE8w2iRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZSIEt7S/2xvsRMz9v5kbMBp0ypOx02J5xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgiip27CKX9nsKpiMD3dTgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUfLP9M/TLXbi/Tv+V34d42cu+7n+4zk8SoOn46bE8w2iRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZTUrT9fd7ETx6ms4sszVsGEy9iyEu51md2UeL5BlIgSRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUcIHDeETM3b0LPs5fuij1H884Wt6Dglfvbgp8XyDKBGlvwBRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJoqQtv8BnORE2ID2KAAAAAElFTkSuQmCC" alt="EVMs #0" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #0</span>
+            <span class="g-addr">0x4a3f…ef97</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACLElEQVR42u3csQ2CQBSAYTA0zMAOVA5hY0xsnIKG1lDRs4eloXUDOndgD2sbq0dyJ983wIXj/rzrruzqpQi1zkMRrTmPBbs5nYNzIjWiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIEr5Uu9351D7T/8j+fTEpQZQgSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKOG3sqsXfwGTEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKBEliJJ8ldfXKXbF5jyGf+XUPsPX7N+X9I8nfONb7HqdB5MS1zeIElGCKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFGyJ/HPtuRii+dlwoW/iGJSgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJogRRIkoQJaIEUfJ/yq5eYlfc4vmbLN79yUIWp2NS4voGUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKGE71ToPsSs+7sfwr+wdVMKnc4tOyKTE9Q2iRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZSk7QOEiinlbCTxHwAAAABJRU5ErkJggg==" alt="EVMs #250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #250</span>
+            <span class="g-addr">0x4f37…3285</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACVklEQVR42u3coW3DQBSAYTuyDMxSWBWGFhcFZgVPENw5OotXKDTKAFVBi03DDIIyQ6R37Tv5+wY43el+3bHXvp5/mvSm4Ra+5rj2Gzx4FafeNSBKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmiJLNusycvMQoGLyWiBFEiShAliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJfy9+llCJGT3j2lexz/wHr+J2vJT4vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRwkO68OEytcz9KbHP/Aev4na8lPi+QZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIkty68BWvh7f4bS5z+JIlRsHkV8XteCnxfYMoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECWihIe03+9f+Xc5rn34mkWm6kTb/15iF6xigpKXElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgShAluXXhK56ej1WcPHwiSgnhs2VOBTb5ucxeSnzfIEpECaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiSjhH7UvH0+xK4ZPlilkXPv8m5yGW/5Nhk+P8lLi+wZRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEpyuwNfuTsxIo9KCwAAAABJRU5ErkJggg==" alt="EVMs #500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #500</span>
+            <span class="g-addr">0x3a59…08ea</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACa0lEQVR42u3coW3DUBSGUbuKyrtBcEBAFsgq3sHIJLJMjIyCyoKjzGLQBbJHQFRcaOm3ZNfnDHDl5H16j93yfL0XUbfho1iDqn4v/yNX8WfG/8l1BMSmiBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEr4o3zuH9mJp+YS/8qx7xzVdk7HTYnnG0SJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKBElTFJ+fR+yE+fY+1PVb0cVcRvy11B8P5GbEs83iBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJogRRIkqYpDxf79mJP59t/CuPr/zMObbqxMWXKK3idNyUeL5BlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYiSZdvFJ459F595ai7xmVXdLv944ltW5jid+G4ZNyWebxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSUMMkuvq2mKPLbao6vdpvHs4ofHk/ITYnnG0SJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKFm28rl/ZCdW9Tv+lTPslinGvlv+8ZyaS3bgHHtgbkP4anNT4vkGUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBKRAmT5HcJgZsSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJaIEUSJKECX/2i92lT5ZZ5dMcAAAAABJRU5ErkJggg==" alt="EVMs #750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #750</span>
+            <span class="g-addr">0x8ba0…1488</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="1000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACSUlEQVR42u3csYnDMBSAYelyYxg8gQdIHcg+JlXApSBVdvAcgdQZwJsYXAauvjLwOKTz9w0gFOfnqXt57scUalpKYk/KMMUe+OWbUhtRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECb/kbt3qv2X4YpCU0ul+q/+HPy/X2AObWKpjUiJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmiRJTwke/X4xB74vH8buKXN3HP0sKXDE/IpMTzDaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgihBlIgSPpLnfow98XS/hd+ylf1E9Qvf+5NSel6uJiWebxAlogRRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJomRPcrdu9d+yDJO/KsS0FJMSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIkn8mz/0Ye2IT22pSSq/Hof5LHs/v+i8ZvunJpMTzDaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgihBlNQtfm0LmJSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoESWIElGCKBEl/KXcrVvsiWWYfNZdmZZiUuL5BlEiShAliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSvbkBwcALgEV/bubAAAAAElFTkSuQmCC" alt="EVMs #1000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #1000</span>
+            <span class="g-addr">0x71a5…2509</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="1250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACOklEQVR42u3cQQ2DMBSAYVg4YYLjshOZBY4IwAEC8IEDHCBgNhbMcJ4GstekDd8noGnLn9cb9WtYq+yd/Ra+ZnvMNzx4Ead+VCBKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmiJGd1tzzdAiYliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJogRRIkoQJeVqpvcndsX9O4bvsj3m8DXPfsv/84QfPMWpwxMyKfF8gygRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJaKES5oidlnEH3BS2KvxhlGalIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoyVvdLc/YFdtjDt9lit+2pNhn/gcv4uuYlHi+QZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElHCJc30/sSuuFdj+C7DN5lon/kfvIivY1Li+QZRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEry1uzf0S3wj/CETEo83yBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSRIko4ZL6NayxK5795lpvpT1mkxLPN4gSUYIoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUXInPzx+MJ1W1rzZAAAAAElFTkSuQmCC" alt="EVMs #1250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #1250</span>
+            <span class="g-addr">0x9742…6cc7</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="1500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACTklEQVR42u3cMYrCQBSA4WgGhNR6nZxgsbDygBZWFjmCXieFlSAobL3NgvAG55HvO8Awk/zMdG91m09dqHEzddG270f4mpfXsWveoZxjF5z7IXyT1+c+dsF1B40RJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlPBHSbHLGsNGxn7KcPRhgVG6KREliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJogRRIkr4yGp3/1nmyS+vY/ubPJSzmxJECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgS/hc/S6jGjJ5xM/lVIa7Pffia4QOP3JR4vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliJK2xY9tmfshxclrDDAJl2Jezfb9cFPi+QZRIkoQJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECV+UY5ZQ+LSaxUrxd9yUeL5BlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYiStpXwOR5ZRqzUGGASLvxj1vg74V/STYnnG0SJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKBElfKSk2GWKuT8pDp5i0pObElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgShAlbfsFvfw2QFP4yBkAAAAASUVORK5CYII=" alt="EVMs #1500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #1500</span>
+            <span class="g-addr">0x3900…2bd4</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="1750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACRUlEQVR42u3cIW6EQBSAYWhAr8KsZU1vUEtN5XIWDkLSm9BkPSfB1qCqVmCqK5s+0pnl+w4wmWH+PNyUt8u9CDWufRFtaKaCw9zOk3siNaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSfijfn19iV2y32Wc9lKXuTEr8vkGUiBJECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRwj8qb5d7+rsc195VhRiayaQEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmi5MHk8ZbQHpa6S3+T7TablCBKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoITFVFrsc1z58zaGZD3jwoZlMShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEoeTHXYky91l8M2TyYliBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRIkpITPl6eotd8Xr+Ct9lu83ha45rn/71DM0Uu+Aej9V8fAa/LWNS4vcNokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGUiBJ+pcpil3u8+xP+TE8WB7+eTUoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiNInQJQgSkQJf/QNlYctJOyv2TMAAAAASUVORK5CYII=" alt="EVMs #1750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #1750</span>
+            <span class="g-addr">0xcb76…92aa</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="2000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACO0lEQVR42u3cQQ3CQBRF0SnBBPuaQAA4QAYGsIEMHFABGKiBrpABGpq8JvPhHAENU26muzfM49K6dz684s98vo9/ePASp941ECWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFHSs32JYZDp+og/83Qv8PfED/655f+deEJuSny+QZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElHCKsM8LtknxpdlNrLF5lFciZcZf5NuSny+QZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElHCKvktoS1U2SfqX4kFJTclogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEr6ti+xiLLF2Mh/HrzEqd2UiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgigRJawyzOOSfWKJtZrW2nR99P8jT/dL/z8yPnjkpsTnG0SJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKOlbfralihLzMvFFFDcliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgShAlogRRIkoQJb8nvyVUYqOHoPjgkZsSn28QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaKkb1+SOzlJ6ZstBAAAAABJRU5ErkJggg==" alt="EVMs #2000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #2000</span>
+            <span class="g-addr">0xcfde…7cd5</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="2250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACUklEQVR42u3cIW7DMBSAYXvqAYaqkrCCoh0jNKwXKe5hyktCA8tKc4WwodGx4sJoz5K9fN8BLFv+ZbOX74dLCtVNY4q29EP4miX2Wf/Bm7idjwSVESWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZTwJj9Ot9gVv3/m8F3uP79c1XZux0uJ7xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgigRJaySn/Ox/l0u/RC+ZhPzicJH/3TT6KUEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmi5J/Jj9MtdsXw8TeFNDFVp8QQpXDhU5m8lPi+QZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIkrrtmpiyEj4YJKW09GmDBy9x3eFreinxfYMoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECWihFXycz7Grrj0QxMnLzGfKFwTk566afRS4vsGUSJKECWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKtiTfD5f6dxk+GGSzmhiq46VElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSRIkoYZVdE7v8PV9dVZDZSwmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEv7mBcV/Oyw8/iBEAAAAAElFTkSuQmCC" alt="EVMs #2250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #2250</span>
+            <span class="g-addr">0x4533…939e</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="2500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACL0lEQVR42u3csQnCQBSA4UTSCZIdAjZCSnfJHilSpUiVwiWs0mcUwT3ECaxtBOEC78j3DXC805+X7srmuhZJ3Ya2yMF7uMQf8jQ/4w/Zz4+0Bx4KCEaUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRwpcy+bMtuRhfXfwhp3qxKUGUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgijhtyqLKbd49+c0PzO4+HBJe2AWjxPZlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoESX8pbyfj34FbEoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkTJTpTNdY0/5fjqkp851csOL57FrW1KRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZTEViU/MZcnVraYM/7Fs/h3bEp8vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRwl+q29CmPbGfFz9rWFu8ypQ8IZsSn28QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaIktg+wNSh6wCCDEwAAAABJRU5ErkJggg==" alt="EVMs #2500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #2500</span>
+            <span class="g-addr">0x89fd…c37f</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="2750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACOklEQVR42u3cvQ2CYBSGUTB0VMRdpIctiD2TuApj0DMMsbK3tiRe4nfjOQMQfp58dG89zlsVql+XKoNtmMq/yRQvM/xNXioojCgRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaKED02Ku0wxsZLiwVPswDgpESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSjgkx5ZQigUcnJSIEkSJKEGUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEl/EQTPtOzDVP4XdoS+quv46TE7xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgigpWz3OW+wVz5hYabs9/Jqv57X8zxP+4Gc8dfgUjJMSv28QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaJElHBIEz79E74sU+XZJwoXPv2T4us4KfH7BlEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZQgSsrWnLHjkUL4IsrfCk/ISYnfN4gSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaIEUSJKOKR+3O7l3+UZuz8pRpT6dYm9YNvtTkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElPCdN95eN7Q5c4UEAAAAAElFTkSuQmCC" alt="EVMs #2750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #2750</span>
+            <span class="g-addr">0x3f7f…bdc0</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="3000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACTklEQVR42u3csW2EMBSAYROxR4rr3NwcJ10FWeBmiJR1mAAqJLaIdA2pUjBCNkid8pSHYuLvG8Ay+JfdvSbnIYUac5ei9euUqOZ0npwTpRElogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGU8EPz9vpe/i7n5e6oQlwvZzcliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJf9MGz6mZ8xd+C7nZJZQjNt2Cl+zXyc3JZ5vECWiBFGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJTwh9pD7PJ6OYevGT5E6RgfvrkpQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKvwBRgigRJfxSW+dgkLTPKJg6hf9JNyWebxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSU8JAm56H8Xe4x92de7hV++CG+2k2JKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliJKyteErHmXEypi78o+nX6YKT8dNiecbRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoESU8pPl4+YpdsV+n8F3uMfdneP4s/3hu26nC03FT4vkGUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBKyvYNKzA4T8SQe+MAAAAASUVORK5CYII=" alt="EVMs #3000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #3000</span>
+            <span class="g-addr">0x80fa…5c88</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="3250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACPElEQVR42u3csY3CMBSA4QS5uOJqNjjRpTkpXaZgAyZglJsgW9DSIFGkdMcKV59OlNSUUV6Ekb9vAMuJfz13bv/2302o6XBpovXj0FDN6WycE6URJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlPAk5Xwrf5drbLLrdnV+ePmbNClxfYMoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECWihFlS+Ir9OISvmR1UTadjUuL6BlEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZQgSkQJs7Tn03/sih/Hrd9alfvPr0mJ6xtEiShBlCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgiipSQpfset2fmtVJpMS1zeIElH6BYgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaKEl2qvX5/l73KN94mmw6X8D+/HIXbBnG8mJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKWCaFv4jyFg+DNCu8iFKt8IRMSlzfIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJEiShhllTtl7/Fm0fhz/SYlCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgihBlIgSRIkoYbEH0MMsuK9PGlgAAAAASUVORK5CYII=" alt="EVMs #3250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #3250</span>
+            <span class="g-addr">0x3a86…b1e7</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="3500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACQ0lEQVR42u3coY3DMBSAYfsUXh0o7yAZoCSwpPTQLRN6KDQksCQDZIhkg7JTNrgZTnqV7Ob7BrAc59czc976NR1St0/lb/Jxuh3w13wkECWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFFSsqaKXbb36zF/T5uG2AWXcTYpQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKHkz+fy8xK5YxWs1BAp/6cmkxPUNokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGUiBL+JW/9Grti+MsyKaXPn6/wNR+nW/m/p9un2AV/v4fwTYa/HmVS4voGUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBKytZUsctXPDbSpsHvNylBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoeQNNt0+xKy7j7FgPJTwhkxLXN4gSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaIEUVK2fH5enAImJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaIEUSJKECX1ylu/xq7Y3q9VfPkyzuVvsorDDD9JkxLXN4gSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaIEUVK2P3cOLEySwaWyAAAAAElFTkSuQmCC" alt="EVMs #3500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #3500</span>
+            <span class="g-addr">0x67c3…675c</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="3750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACY0lEQVR42u3csW2DQBSA4SNiACQ31AzgMWhYI5Ur15ZcIblGFAySki3CFDRIHiF1SuSHDPL3DXA6eL/uusuavkqhnuU9RSvmNnzNLfa5/w8/xHS+EuyMKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJooR/st/vn9gVb+dr+C6P8hTM/j98i69+TJ2TEtc3iBJRgihBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkp4o/xSL7ErFvMxvnyL94k+U3hCTkpc3yBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSRIkoYZX8ELscxpNRhbidnZQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoEaVfgChBlIgSXhT/bMtj6sLXvNSLUYUYxg2mUwZPx0mJ6xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgigRJaySNX21/10+y7tRhSjm1kkJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJek4e/iDKMp/BdXsrFqEI8pi5+OnXwdJyUuL5BlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUcIqWdNXsSuGP06Utnmf6Ha+7n884U//hL/7k1Iq5tZJiesbRIkoQZQgSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIo+SR/Kpc7E6/mC4AAAAAASUVORK5CYII=" alt="EVMs #3750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #3750</span>
+            <span class="g-addr">0x8b28…240f</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="4000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACR0lEQVR42u3cva3CMBSAUfLkMhV6NUKiRGESCkoGYAoGYAAmScEkoaZhACoGYAUibiRfOGcAyz+f7M7NYbmfVW/zvM6IMLRd/ZP8c06IEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKKlaSfEjSorPRlJIcdxuSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGUiBJGKSlmebyvwse8zPv6F7597KJX7S8hECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIjSFiBKECWiBFHybUr4bzWnxW2CefbhIw5tl+GA+vpXHf7Tk5sSzzeIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFFSt+aw3MeOuHlew2c5xWcjU8yz/oWnOB03JZ5vECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmiRJQwSnP+X9sF3JQgSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIEkSJKOFtZWi72BGP91WKlZ8Wt/onmWIzw3fSTYnnG0SJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKBEljFJSzPIy7ycYtfvBhW8fOzcliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkr4zAvyci8E9xcQBgAAAABJRU5ErkJggg==" alt="EVMs #4000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #4000</span>
+            <span class="g-addr">0x355a…21fd</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="4250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACRUlEQVR42u3c0W3CMBRA0bhkAFawxFwgJmADVDFBmSDqJCxClIyQBZD63c+IZ2Er5wxg2cmV/fdSHucu1Olw7aL9Pm/ha152U1e9+ytv8O98dVAZUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAn/pJ/5Ebti+KSRrsyIlRL7rP/gTfwdNyWebxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSUsErfxC6XPMQv+rxt8eAtnNpNiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUcIqKY9z/bu87Ca/KsT9ld2UIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiSjhPek7HWNX3E/n8F02MWykCSUG4Cx5cFPi+QZRIkoQJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECR/UN7HLEhNwmphPVOLgbkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElPCelMe5/l0a27KpU7spESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSlilPx2usSvup7PPWq0SU5mWPLgp8XyDKBEliBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlW/IHFrA7IY5nvfIAAAAASUVORK5CYII=" alt="EVMs #4250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #4250</span>
+            <span class="g-addr">0x91a7…82e2</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="4500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACTElEQVR42u3csWnDQBSA4VMQuDSkcO1GC7j2FF4hnUfRAOo8jXov4MbgToXB4CZd6pQiT3Av+r4Bjnfi59S95nHqS6j7dC4ZHF6X+oe8br/qH3K/G2IP/ChQGVEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJvzTj8V3/lEusWHl23/Vf/PO2iT0wxR4YLyWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZQgSkQJs7Qpplxi7899Oie4eTcEHzh5KUGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiSp8AUYIoESWIkv+mGY/v2BP3u8FnXZXwrUxeSvy+QZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIkro1j1Nf/5Thi0FKkvUy4RdPcWsvJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBKRAmztCmmXGIDzhL7iVJc3EsJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBL+Jn5tS4p1KFmsc7eMlxK/bxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSUMEubYsrwbTVlrWt6UtzaS4koQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIkrr9AFmsMwZkWv9hAAAAAElFTkSuQmCC" alt="EVMs #4500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #4500</span>
+            <span class="g-addr">0xd309…7d03</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="4750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACUElEQVR42u3cwWnDMBiGYatkA0Om6ArdJIF6hnaMZADfDM0MuXeHTBHIDjnnaPgEUvw8AwhLfpFuf5nGeYj6/rsMacvxEF+zxne2v/Eu/s7HAI0RJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlPCi/F+/sivWGLFyOud3ftt3MLbl8x4+zN+f/EfGR8G4KfF8gygRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJaKEVco0ztvceY35RHE1Rv+4KUGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgih5M7v4SJ1tjr/ZsnhCbko83yBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSREnbyjTO2RXjQzwq6WK8TBeHGT9JNyWebxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSUsEp5LOFZQl3M6CEoPvDITYnnG0SJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKGlbmca5/a+MDwYZOhkvE994F7t2UyJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmiRJSwyq7GmJ642/5SYdXDBjd+OnewazclogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEra9gSZxy/k2ZtTtQAAAABJRU5ErkJggg==" alt="EVMs #4750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #4750</span>
+            <span class="g-addr">0xebde…116b</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="5000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACVklEQVR42u3cIY6DQBSA4WGDq6/jEvQQlTV4PKegl0A2wVRhmt6DS+Dq61ev2YTkkQzh+w7wwjB/ZtwU7+s9heqaOUUbpjp8Zt9WKXv9uBxwd34SZEaUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRwh9l+MTz6RY+s2te8Uv/zvlvT9fsYHdSCn5bxkmJ6xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgigRJaxSXJ6PY668H5cdfGRbOSlBlCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIo4X/F+3qPnbjF8zef78tWhTifbuEzw19lclLi+gZRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEryVlyej9iJWzyxMky1rQrRNXP4zPCnYJyUuL5BlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUcIq5WFX3rfVDj5yXJyUIEoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiSghM+UGD4PUfmu2hmmL3QlOyEmJ6xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgigRJaxS7uIr+7aKnxn/iNIOFr6LVTspESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFGSt184XjLh6H4ZjAAAAABJRU5ErkJggg==" alt="EVMs #5000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #5000</span>
+            <span class="g-addr">0xf5f4…e0fe</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="5250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACOElEQVR42u3cvQ2CQBiAYTEkDEBhY+cqzuDPDIZpCHOwhQvYUdNY0JrQOYPJkdznPc8A5Lh7c9d91Xl67orUrn3+i1yarsCj2e9AlCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSREnOquvrbhdwU4IoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECWiBFESV538i0vThfjzdu3zX2SIzUy+k25KPN8gSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIEkSJKOEndYhVhpj7E+LHQwwnclMiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJoiRvMca23E4XR5XEMLspQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKW4AoQZSIEkTJv6nGz5j2i8N8CPHnj+M7/0WG2MzkO+mmxPMNokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGU5K06T8+0X9xiHMoW00vatc//eJamK/B03JR4vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRwk/SzxLaYkZP8pE6xQpxOm5KPN8gSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIEkRJ3r67WjAm7cSkSQAAAABJRU5ErkJggg==" alt="EVMs #5250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #5250</span>
+            <span class="g-addr">0x1f81…2fac</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="5500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACOUlEQVR42u3cu62DQBBAUbCowQGZC6EAN+EI6VXgiJiYeFOaoADcBA0guYsXOzPSIC/inAJWfK5msymHdilC/d0fRbQ0jeFnrn1TZK/u5hP+nUsBmRElogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGU8KHaY48HpxKekEmJ6xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgigRJWxSpWmMPXGP5URr34SfWXdz/r8n/sVft/CHDE/IpMT1DaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgihBlIgSNqkO8ZR77P3ZY+dRuBT+4kd4a5MSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECV5i1/bkqbRZ83WIf6OSYkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElHCJuXQLr4CJiWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSvha+XxfY0+su9lnPZW1b0xKXN8gSkQJogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKOGHyqFd8n/K8G01p3WITU8mJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBK8vYPjucs+Kf+UzIAAAAASUVORK5CYII=" alt="EVMs #5500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #5500</span>
+            <span class="g-addr">0x3f7d…30d8</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="5750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACTElEQVR42u3csW3DMBBAUVEQNxAyQ+ARUniNTOAmjRu3GUJNGk+QRdy4N1yryRAGjNQpBRwBMnxvgINof5Ddpevnfgj1drgN0Y55DJ+5PJ5D9cIPXuLUl/MuduA4QGVEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJfyR8jrHTmxlxUqJ76z/4E38O25KPN8gSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIEkSJKGGTqYmVOiWU2E/Up/CE3JR4vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRwiYpr3PsxFaWEzWxS6iJHzP8l3RT4vkGUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBK6jY18ZXvX6/hM5fDrcODf3/c3ZQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGU/DPp9PNS/1cuj2f4zGMeOzx4E6d2UyJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmipG4pr3PsxCYWgxAofLeMgPB8gygRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJaKETaZuTx6+AaeEPhczuSkRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaIEUVK3X5dpNPmLnHe2AAAAAElFTkSuQmCC" alt="EVMs #5750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #5750</span>
+            <span class="g-addr">0x018c…0b81</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="6000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACUUlEQVR42u3csY3CMBSA4QRR3iwobQbIAFRsgZQGKROkzBxUVHcNA2SMW4WaBhHpPclWvm8Ay45/Od1rh+upCbWOcxOtX6bwNTP2Wf7Bq7idQwOFESWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZTw5hi+YsaIlfPzknD2qfzrSTh4Baf2UiJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmiRJSwSfwsoXWcE9aMP3m/3Mu/nttfF71kl/Alg+cTeSnx+wZRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEpECZvEzxIKnyzT5MwnOj8v5V9P+BCljNvxUuL3DaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlOxM/NiWjBErGR7DvYZtduXfTvgoGC8lft8gSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIEkSJKGGT9uf/11fASwmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZSIEr7WDtfTPk++jnP5m+yXyUsJogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECZ8dq9hlxtyfKsb0hB+8ilN7KREliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJogRRUrYXARgwuNVKVuwAAAAASUVORK5CYII=" alt="EVMs #6000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #6000</span>
+            <span class="g-addr">0x3209…4773</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="6250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACWklEQVR42u3csW3DMBBAUTNQqy20RHoXVqkNLGQAZxVNIJfp1AiQC3fJQoIHcOqUBk4ICb03wIEEP8iOaZ2bQ6hlGg/R2q4Pn7nFOvPfeBGn83aAzIgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBK+KMKnzjUKXxm66D2dDpuSjzfIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJEiSjhJenr4zt2Ytv14atcptFR7ed03JR4vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRwkuqLT6XKcJQp/wXeXk8819keEJuSjzfIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJESd6q0/0aO/F2PBex8yLWuUxj/osMT8hNiecbRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoESW8JK1zEztxi+9v2q53VPs5HTclnm8QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaIkb+n98yd24u14LmLnW3xgEq6I/2pO96ubEs83iBJRgihBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkr4R2mdm/xXucW/P0Od8t/45fGMHVjE50RuSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGU5O0XRPw6G8Y3PO4AAAAASUVORK5CYII=" alt="EVMs #6250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #6250</span>
+            <span class="g-addr">0x0f1e…1c9e</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="6500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACYUlEQVR42u3czWnDMBiAYavOEHXBJKeuIOgguXUM++QJbOgg2SRbOGQOk557DHymUvs8Awj9vEg3pdxNTah2uDQ12JZz+ZOsYjPDd/KlgcKIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSvjhED7iOucqVn4aK/gRpYrN7JObEs83iBJRgihBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkr4TSl3U/mzbIeLowqxLWc3JYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECV/THp7/Ywd8TReq1j5OufyJ1nFZobvpJsSzzeIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFFStvTx9R47YhXfoTRN06dj+ZO8P27lTzL8bxk3JZ5vECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRAmiRJTwlJS7KXbEdriEz3JbzuFj7jHP8hdexem4KfF8gygRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJWU7VPF7yf1xCx/zVMPxhC98j1WHJ+SmxPMNokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGUiBKeknI3xY64y78/49VRhVjnHD5mn45uSjzfIEpECaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEyX/yDY+WNw4uC8DZAAAAAElFTkSuQmCC" alt="EVMs #6500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #6500</span>
+            <span class="g-addr">0xd673…7c38</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="6750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACSUlEQVR42u3cwcnCMBiAYSP/oUehdwfoqVvoDC5SnEB67g6uUF2kA3gsBBzhn0H4xIQ+zwAfbfKS3JJyM++gJHtLgChBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYiSov2FT8zdGD7z+XjbqhCn8yF8ZrsMTkpc3yBKRAmiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIko4YfStPaxEy/Hm2XdlPvr6qTE9Q2iRJQgShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEn4o5WYu/yvDX6vZrCpeenJSIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaKkbGla+9iJVTwMsqvkKZgqFjN8JZ2UuL5BlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUcJHUm7m8r8yd2P4zHYZNvjjVfy1kxJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJWWLf7bl/rqGf+XleLNV29kdJyWubxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSU8JE0rX3sxG+8+5O7MXzm8/Euf3tO50PswHYZwj8y/H0iJyWubxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJoqRs//2wNGvSe8TzAAAAAElFTkSuQmCC" alt="EVMs #6750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #6750</span>
+            <span class="g-addr">0xc43e…f6d3</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="7000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACO0lEQVR42u3coQ3CQBSAYY6QIEB1HlZhgHoUA6DqW98dmIENcPWYKipwaAwJ4TW5S79vgMvd9c+ru3TvbqtQ1fO0YknGfRO74NqdkhtRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECR/SMF3dAiYliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJogRRIkoQJeXaLPbkr77Kf5Pb42hSgihBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUcJ38W8J7dpLGUevz/nvsYjLnKJv0qTE7xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgijJW7p3t/x3uT2O4Wu++mqBBy/i1CYlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEpECT9Jw3TNf5e79hK+5rhv8j949TzFLjjVZ5MSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESX8J/7ZljmeWCnisZEiFPF1TEr8vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRwk/SoznErjjHuz9zvICzTEV8HZMSv28QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaIkb29I4jJ8zqoIQgAAAABJRU5ErkJggg==" alt="EVMs #7000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #7000</span>
+            <span class="g-addr">0x81ee…90ce</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="7250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACMklEQVR42u3csQ3CMBBA0QRRhmEYI0tkAUJPagrogQWYgYatIpEBmAHpED783gBWHH2du2uf/bEpXreZws8ch6X8i1/vXeyBy+tU/q1XDYgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoKdk6xVd+Z9nIvtaLm5QgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGU/JV2+5jL/8rrvQs/M8Wanm4zxR44DotJCaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRMmfid8ldL5d/NaqHHZ7kxLPN4gSUYIoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUVKT+LUt32AVTJTwFSsmJZ5vECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJTwc/G7hLLs/UmxVSfFzwz/kyYlnm8QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaKkbO2zP5b/lSlWrKSQYg+MSYkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElHCR9rtY67z5im26tS5RMmkRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAlogRRgigRJYgSUYIoESWIEkRJ2d63ozEwXdliKAAAAABJRU5ErkJggg==" alt="EVMs #7250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #7250</span>
+            <span class="g-addr">0x3835…9624</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="7500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACQElEQVR42u3coRHCMBSAYcrFINCVTILqAgyAxTIMtrayggVQ6A7BDAgsM/R4uXs5vm+Ad036X+LSzUu/gUy2tgBRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJamVz2EfO3H3ejex8vCF19DEZobvpJMS1zeIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSlilhE+s8UZPK+8T5dfEC0pOSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGUiBJWKeHP9NR4rabGzHEa8v+ey/mR/yPDE3JS4voGUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBKcuvmpbcLOClBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUYIoaVdp4itvz1P4zMv5kX/h4zTEDrwe705KECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJTwm25e+tiJn8O+iZXvXu/8H9nEZobvpJMS1zeIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSlilhE+s8UbP7XkKn3k93vP/nnEa/nDVTkpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgihBlOT2BVyALnD/k+PoAAAAAElFTkSuQmCC" alt="EVMs #7500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #7500</span>
+            <span class="g-addr">0xa3a2…a294</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="7750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACQUlEQVR42u3csYkCQRSAYVcWI7EDWziwj0OzZQPBRiznDsTLluPa2CJswcjI2FB4w81jvq+AYd/Oz0w23elnuaje/FiHr7lb3RscPMXUCYqkNaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSXvThK26/fuPXbHV7Ugx+O346KXF9gygRJYgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaKEf9SdD3/1f+U0jOFr7q+XBgdPMbWTElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgShAlooS39OErZnn3p8R31j94it1xUuL6BlEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZQgSuoW/2zLbnVPMXmJp2Dql2J3nJSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKBElvKWfhjF4ycc6/Cu3BSaPH7yA8AeP5gK7M0f/SSclrm8QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaKkbt3H98ZfwEkJokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGUiBJESV59+Ir768Vvbco0jE5KXN8gSkQJogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkRJS55pCS0zX9cQZgAAAABJRU5ErkJggg==" alt="EVMs #7750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #7750</span>
+            <span class="g-addr">0x5ab8…81b2</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="8000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACR0lEQVR42u3csQ3CMBBAUQc5Eg0Va9BkCXZgj+zEDmQIGrrMQEWDlIYZIp2FLb83gJXYX3Z3wzKvqUvH57n+j/xO7w6P5pBAlCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSREnNcvj0kvFyD//Kz3h1VCFO2yN8ze11c1Pi+QZRIkoQJYgSUYIoESWIElGCKEGUiBJEiShBlIgSRIkoQZQgSkQJokSUIEpECX80LPMau2L4cKKU0nd6O6p+TsdNiecbRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoESXskksMl2lCEz/exBCl8J10U+L5BlEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZQgSuqWw1csMWnktD3C1/xM1/qPJ/zHS/y1sS14vkGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRwn8Ny7zGrhg+WaaQEjOPwjWxmeE76abE8w2iRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZTULYcPBmliHErqdSJKEzvppsTzDaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgihBlIgSdsnh02qamNGTeh3T08ROuinxfIMoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECV1+wFpbTr0riky7QAAAABJRU5ErkJggg==" alt="EVMs #8000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #8000</span>
+            <span class="g-addr">0xb990…45f6</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="8250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACLUlEQVR42u3csQ0CMQxA0QO5hW1oqFkBMRDTIPagoWYRWIAZIjmSrbw3QHS5fCWdd5/7ZSvvcfxtZLh9D/U/cu+cECWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFFSWqSv2GXESosBJuk/c8bppP9JNyWebxAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSUMCTSh8u0mNGzNZl5tObAIzclnm8QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaJElDAk0qfVzJjRM2OkTpeZRwuejpsSzzeIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFFSW6SvOGMcSpdRMPU33mLXbkpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUSJKECWIElGCKBEliBJRgihBlIgShuTPElp27s8M6RtvcTpuSjzfIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJESW2RPsdj2RErLcw4nfSE3JR4vkGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFEiShAliBJRwpBo8ZXv5zl9zdP1teDGW+zaTYkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIktr+h9o5DoQbc/wAAAAASUVORK5CYII=" alt="EVMs #8250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #8250</span>
+            <span class="g-addr">0x3e77…2b25</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="8500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACLElEQVR42u3csQnDMBBAUSl4Ag/hSTKBIbhInRkyjGsXwpA9XGWTzJA6peECEnpvAGHZn3N3eTpKClVea4q2zI9EN1/n4jtRG1EiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJP3L42pZ/+MeykT41sQDHpESUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJEiSjhlPx+Xvu8eRNbdfpcomRSIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaJElHDKEH5iEzt6UkrbPtb/kMutx4VHJiV+3yBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSREnd8nSU+p8yfDFIamS9TPjFm7i1SYkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElHCKW3sEsKkBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJ1Ri2fYw98X77eK1dCU/IpMTvG0SJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKBElnJKno9T/lOW1hp+5zI8OL97ErU1KRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZTU7QtqOi0OLYIoTAAAAABJRU5ErkJggg==" alt="EVMs #8500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #8500</span>
+            <span class="g-addr">0x5c44…13d4</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="8750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACaUlEQVR42u3coY3DMBSAYecUEh7SOaqDpUUZojOcwrJCJzjUIYJKi8NuhjSgvPTwwUgvkn35vgEsO/7lsFd9f/2kUMfHLUWbTpfwNbumTdkb368d3s5HgsyIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSvijmocl/12GTy/ZrSKG1XgpESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSlilft6vBWzzdAlf8vi45X/uKfrgRVy3lxJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJaKEVap5WGJXHN+v8F1uMffncO7zv57w0T/TBlOZuqb1UuL3DaJElCBKECWiBFEiShAlogRRgigRJYgSUYIoESWIElGCKEGUiBJEiShBlOxJHT5lZYsRK5sMGynhesIPvsXtjNGb9FLi9w2iRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZSIElap5mGJXTF8OFFKqWva8DW32Gf+By/idryU+H2DKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgShAleauL2GUpo2CKOLiXEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWiBFGCKBEliJJ/ppo++9gVD+e+iJM/79f8N1nExwz/kl5K/L5BlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYiSvP0CGpJHrVWl778AAAAASUVORK5CYII=" alt="EVMs #8750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #8750</span>
+            <span class="g-addr">0xb62c…1d3f</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="9000">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACQUlEQVR42u3csa3CMBRAURsxQhb5TRago0nPCkwASplZkChTUKZMkwaxDPWvKZGeJVucM8CTHV/ZXfLrvKZQh9NfirbcnuEzS6yz/o03cTq7BJURJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlPBhf7k/gkcW+DFI/CJTWlo4nt88HTclnm8QJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaJElPCVffjE5fYMn3kpsPNDgb/qhOujf9PTxOm4KfF8gygRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJaKEr+RufcdO7IcpfJXbPIbPLLHO+jfexOm4KfF8gygRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJXXLx+7qK+CmBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZQgSkQJoqRduVvfv7nzfpjqX+Q2j25KECWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiRJQgShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkQJokSUIEpECYHysbvGTtzmMXyV/TCFzyyxzvo33sTpuCnxfIMoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKECV1+wd4cTfucJ95KgAAAABJRU5ErkJggg==" alt="EVMs #9000" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #9000</span>
+            <span class="g-addr">0xe168…52cc</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="9250">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACTUlEQVR42u3csWnDQBSAYSkYvITBlVxpBJXq0tm9G4HWcS9Q4y0MKjWCioAqDZHCXeo0AcMLuXDfN8BD6H7edVe+f34UofbXrYi2NF34zKqfiuStQxs7sJ7H8I983o+xA98KSIwoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmihG/K8+URO/E3nlghZeFPwdiUuL5BlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUcJLduETq34Kn7kOraNK9nSKebMpcX2DKBEliBJEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlooQ/VJ5uh9iJ9Tz6rVlZms6mxPUNokSUIEoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGU5CT+2Zb/ouqn9D9yHVqbEkQJokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJ+tqvnMXbi0nR+a1bCE7IpcX2DKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgShAlaSvPl0fsxOf9GP6V++vmqPI5HZsS1zeIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSnhJebodYifW8+i3ZmVpOpsS1zeIElGCKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEpECaIEUSJKECWiBFGSky8nuS539pNwSgAAAABJRU5ErkJggg==" alt="EVMs #9250" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #9250</span>
+            <span class="g-addr">0x1c44…61d6</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="9500">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACSklEQVR42u3cQQ3CMBSA4UJmAQscl3ngMAUImAOuZOcFGROAhnkgO2IBE2ggeQuv2fcJaNr0T3t7h1vflfTmqQ1f8/065T/4ufvELjiMa/5THwuIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFGCKMmsuV8vFWxzXOLXrOHg4VNWqrhuLyWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZQgSkQJP2nCVzx3n/A1h6ebyns779fJS4nvG0SJKEGUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJaIEUYIoESWIElGCKBEl/FH8LKHwyTKllIeLSnw7Xkp83yBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKBEliBJEiShBlIgSRMnOxI9teTyX8DXnqY0/+rjkv574g29w6vv14qXE9w2iRJQgShAlogRRIkoQJaIEUYIoESWIElGCKBEliBJRgihBlIgSRIkoQZSIEv7ocOu72BXDJ8uUbeYT7VMVt+OlxPcNokSUIEpECaJElCBKECWiBFEiShAlogRRIkoQJYgSUYIoESWIElGCKEGU5NZsMcejCvPU5t/kMK75NxmekJcS3zeIElGCKBEliBJRgihBlIgSRIkoQZSIEkSJKEGUIEpECaJElCBKRAmiBFEiSvhJs9uTVzGmx0sJogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEry+QJG3y1nwSf7CgAAAABJRU5ErkJggg==" alt="EVMs #9500" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #9500</span>
+            <span class="g-addr">0xf5e8…a98f</span>
+          </figcaption>
+        </figure>
+
+        <figure class="g-card" data-id="9750">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACOElEQVR42u3csQ2CQBSAYTE3A7WNBTNYuIQNG9jROIYDyA4uIYkzUNhYM4UzkDyTe+H7Bngh3J+77jXtMO426XB81f+R3895g0ez34EoQZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIkpqV8InPpQufeWnn8Jnb3IiS4nTclHi+QZSIEkSJKEGUiBJECaJElCBKRAmiRJQgSkQJogRRIkoQJaIEUSJKECWIElHCKk07jP4CbkoQJaIEUSJKECWiBFGCKBEliBJRgigRJYgSUYIoQZSIEkSJKEGUiBJECaJElCBK8irPpYudeDs9wr/y/r6Gz7y0c/3Hs83TcVPi+QZRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIErq1kz9FDsxxToUAoXvlnFT4vkGUSJKECWiBFEiShAliBJRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlCBKRAmrlPDVP+GbZf4kxc6jFD8z/E+6KfF8gygRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJokSUIEoQJXVrpn6q/ytTrFhJIcUeGDclogRRIkoQJaIEUSJKECWIElGCKBEliBJRgigRJYgSRIkoQZSIEkSJKEGUIEpECauU8In/2PuTYgNOCilOx02J5xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgiip2w+VKzCtGX5l5wAAAABJRU5ErkJggg==" alt="EVMs #9750" loading="lazy" width="220" height="220">
+          <figcaption>
+            <span class="g-id">EVMs #9750</span>
+            <span class="g-addr">0xab2e…1450</span>
+          </figcaption>
+        </figure>
+    </div>
+    <div class="g-foot">
+      <a href="https://opensea.io/collection/evms-" target="_blank" rel="noopener" class="btn btn-ghost">View Full Collection ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- IDENTITY FLOW -->
+<section id="identity">
+  <div class="wrap reveal" style="text-align:center;">
+    <div class="eyebrow" style="justify-content:center;">How It Works</div>
+    <h2>ADDRESS → IDENTITY</h2>
+    <p class="lead" style="margin:0 auto 50px;">Deterministic, step by step.</p>
+    <div class="flow" id="flowDemo">
+      <div class="flow-step" data-step="0">
+        <div class="flow-label">Wallet Address</div>
+        <div class="flow-value mono">0x8e30458B36017Fad1D7381BF6CdC7bE8e4127674</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" data-step="1">
+        <div class="flow-label">Deterministic Seed</div>
+        <div class="flow-value mono" id="flowSeed">0x4a3f3785365760ceb18262cc12b3b412f67cef97</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" data-step="2">
+        <div class="flow-label">Blockies / Identicon</div>
+        <div class="flow-icon-box"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcCAIAAACUOFjWAAACT0lEQVR42u3csY3CQBBAURs5oQHHtEB4VVCFEyJLVEAHG90FpBSAqyCEOqji4guRZsT69r0CRpj92s2mP193XahxKl2012UOn5nxO+v/8FWczqaDyogSUYIoESWIElGCKBEliBJEiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBK+GMIn5ixYoWmTsdNiShBlIgSRIkoQZSIEkQJokSUIEpECaJElCBKRAmiBFEiShAlogRRIkoQJYgSUcJb4ncJjVMJn2k/UVOn46bE8w2iRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZSIEt7S/2xvsRMz9v5kbMBp0ypOx02J5xtEiShBlIgSRIkoQZQgSkQJokSUIEpECaJElCBKECWiBFEiShAlogRRgiip27CKX9nsKpiMD3dTgigRJYgSUYIoQZSIEkSJKEGUiBJEiShBlCBKRAmiRJQgSkQJokSUIEoQJaIEUfLP9M/TLXbi/Tv+V34d42cu+7n+4zk8SoOn46bE8w2iRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUYIoQZTUrT9fd7ETx6ms4sszVsGEy9iyEu51md2UeL5BlIgSRAmiRJQgSkQJokSUIEoQJaIEUSJKECWiBFEiShAliBJRgigRJYgSUcIHDeETM3b0LPs5fuij1H884Wt6Dglfvbgp8XyDKBGlvwBRgigRJYgSUYIoESWIEkSJKEGUiBJEiShBlIgSRAmiRJQgSkQJoqQtv8BnORE2ID2KAAAAAElFTkSuQmCC" alt="identicon step"></div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" data-step="3">
+        <div class="flow-label">EVMs Identity</div>
+        <div class="flow-value mono">EVMs #0</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GTD -->
+<section id="gtd">
+  <div class="wrap reveal" style="text-align:center;">
+    <div class="eyebrow" style="justify-content:center;">GTD Application</div>
+    <h2>CLAIM YOUR SPOT</h2>
+    <p class="lead" style="margin:0 auto 40px;">Apply for the EVMs GTD whitelist.</p>
+
+    <div class="gtd-panel">
+      <div id="gtdForm">
+        <div class="wallet-pill" id="walletPill">
+          <span><span class="status-dot"></span><span id="walletPillText">No wallet connected</span></span>
+          <button class="copy-btn" id="walletConnectInline">Connect</button>
+        </div>
+
+        <div class="field">
+          <label for="fX">X Handle</label>
+          <input type="text" id="fX" placeholder="@yourhandle" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="fWallet">EVM Wallet Address</label>
+          <input type="text" id="fWallet" placeholder="0x..." autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="fLink">Like &amp; Repost Link</label>
+          <input type="url" id="fLink" placeholder="https://x.com/..." autocomplete="off">
+        </div>
+
+        <button class="btn btn-primary" id="gtdSubmit" style="width:100%;">Apply for GTD</button>
+        <div class="gtd-error" id="gtdError"></div>
+        <p class="form-note">Applications collect your X handle, wallet address, and like/repost link for manual GTD review. Connecting a wallet does not request a signature or any transaction approval — it only identifies your address for this application.</p>
+      </div>
+
+      <div class="success-box" id="successBox">
+        <div class="success-icon">✓</div>
+        <h3 style="margin-bottom:10px;">YOU'RE IN.</h3>
+        <p class="lead" style="margin:0 auto;">Your EVM wallet has been submitted for GTD review.</p>
+        <div class="wallet-pill connected" style="margin-top:22px;">
+          <span><span class="status-dot"></span>Connected wallet</span>
+          <span class="mono" id="successWallet"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap reveal" style="max-width:760px;">
+    <div class="eyebrow">FAQ</div>
+    <h2>QUESTIONS</h2>
+    <div id="faqList">
+      <div class="faq-item">
+        <div class="faq-q">What is EVMs? <span class="plus">+</span></div>
+        <div class="faq-a">EVMs is a collection of 10,000 deterministic Ethereum wallet-style identities built from the visual language of EVM address identicons.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How many NFTs are there? <span class="plus">+</span></div>
+        <div class="faq-a">10,000, token IDs 0 through 9999.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What network is EVMs on? <span class="plus">+</span></div>
+        <div class="faq-a">Ethereum.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the supply? <span class="plus">+</span></div>
+        <div class="faq-a">Fixed at 10,000. No further minting beyond the original supply.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How are the identities generated? <span class="plus">+</span></div>
+        <div class="faq-a">Each token's seed is derived from keccak256("EVMONHOOD" + tokenId), formatted as a 20-byte hex value. That seed drives a fixed Blockies-style algorithm: a deterministic PRNG fills an 8×8 grid, mirrors it horizontally, and derives three HSL colors from the same seed stream.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Are the identities deterministic? <span class="plus">+</span></div>
+        <div class="faq-a">Yes. The same seed always produces the same grid, the same colors, and the same image — every time, by construction.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is a Blockies-style identicon? <span class="plus">+</span></div>
+        <div class="faq-a">The classic algorithm behind early Ethereum wallet avatars (used by MetaMask, MyEtherWallet, and others): a hash seeds a small pseudo-random generator that fills a mirrored grid and picks a small, fixed color palette.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How do I apply for GTD? <span class="plus">+</span></div>
+        <div class="faq-a">Connect your wallet, then submit your X handle, wallet address, and a like/repost link in the GTD section above.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Which wallet should I use? <span class="plus">+</span></div>
+        <div class="faq-a">Any injected Ethereum wallet (e.g. MetaMask) works. Use the wallet you intend to use for the mint.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Where can I view the collection? <span class="plus">+</span></div>
+        <div class="faq-a">On OpenSea — see the link in the footer and the final section below.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the contract address? <span class="plus">+</span></div>
+        <div class="faq-a mono">0x8e30458B36017Fad1D7381BF6CdC7bE8e4127674</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I submit more than one wallet? <span class="plus">+</span></div>
+        <div class="faq-a">Each wallet address may only submit one GTD application. Duplicate submissions from the same address are rejected.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRACT -->
+<section id="contract">
+  <div class="wrap reveal">
+    <div class="eyebrow">On-Chain</div>
+    <h2>CONTRACT</h2>
+    <div class="contract-box">
+      <div class="contract-row">
+        <dt>Network</dt>
+        <dd>Ethereum</dd>
+      </div>
+      <div class="contract-row">
+        <dt>Contract Address</dt>
+        <dd class="copy-row">
+          <span id="contractFull">0x8e30458B36017Fad1D7381BF6CdC7bE8e4127674</span>
+          <button class="copy-btn" id="copyContract">Copy</button>
+        </dd>
+      </div>
+      <div class="contract-ctas">
+        <a href="https://opensea.io/collection/evms-" target="_blank" rel="noopener" class="btn btn-ghost">View on OpenSea</a>
+        <a href="https://etherscan.io/address/0x8e30458B36017Fad1D7381BF6CdC7bE8e4127674" target="_blank" rel="noopener" class="btn btn-ghost">View on Ethereum Explorer</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="justify-content:center;">Explore</div>
+    <h2>EXPLORE EVMs</h2>
+    <p class="lead" style="margin:0 auto 30px;">10,000 identities. One Ethereum-native visual language.</p>
+    <a href="https://opensea.io/collection/evms-" target="_blank" rel="noopener" class="btn btn-primary">View on OpenSea</a>
+  </div>
+</section>
+
+<!-- SOCIAL -->
+<section style="padding-top:0;">
+  <div class="wrap reveal" style="text-align:center;">
+    <div class="eyebrow" style="justify-content:center;">Follow</div>
+    <h2>@evm_eths</h2>
+    <a href="https://x.com/evm_eths?s=11" target="_blank" rel="noopener" class="btn btn-ghost">Follow on X</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="logo">EVM<span class="dot">s</span></div>
+        <p class="lead" style="margin-top:10px; font-size:14px;">10,000 Ethereum Wallet Identities.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://opensea.io/collection/evms-" target="_blank" rel="noopener">OpenSea</a>
+        <a href="https://x.com/evm_eths?s=11" target="_blank" rel="noopener">X</a>
+        <a href="#gtd">GTD Application</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      Ethereum &middot; Contract: 0x8e30458B36017Fad1D7381BF6CdC7bE8e4127674
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  "use strict";
+
+  // ---------------- CONFIG ----------------
+  const CONFIG = {
+    contract: "0x8e30458B36017Fad1D7381BF6CdC7bE8e4127674",
+    workerEndpoint: "https://evms.osamasadoon124.workers.dev", // the "evms" Worker (KV + GOOGLE_FORM_ID configured)
+  };
+
+  // ---------------- MOBILE NAV ----------------
+  const navToggle = document.getElementById('navToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  navToggle.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+  // ---------------- REVEAL ON SCROLL ----------------
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // ---------------- FLOATING BACKGROUND CELLS ----------------
+  const floatingWrap = document.getElementById('floatingCells');
+  const cellColors = ['#627EEA', '#8b7bff', '#5ee7ff', '#3ddc84'];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('div');
+    el.className = 'fcell';
+    const size = 10 + Math.random() * 22;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.top = Math.random() * 100 + '%';
+    el.style.background = cellColors[i % cellColors.length];
+    el.style.animationDelay = (Math.random() * 8) + 's';
+    el.style.animationDuration = (10 + Math.random() * 10) + 's';
+    floatingWrap.appendChild(el);
+  }
+
+  // ---------------- IDENTITY FLOW STEP REVEAL ----------------
+  const flowSteps = document.querySelectorAll('#flowDemo .flow-step');
+  const flowObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        flowSteps.forEach((step, i) => {
+          setTimeout(() => step.classList.add('active'), i * 220);
+        });
+        flowObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  if (flowSteps.length) flowObserver.observe(document.getElementById('flowDemo'));
+
+  // ---------------- FAQ ACCORDION ----------------
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+
+  // ---------------- COPY CONTRACT ----------------
+  document.getElementById('copyContract').addEventListener('click', async (e) => {
+    try {
+      await navigator.clipboard.writeText(CONFIG.contract);
+      const btn = e.target;
+      const old = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(() => btn.textContent = old, 1400);
+    } catch (err) {
+      console.error('copy failed', err);
+    }
+  });
+
+  // ---------------- WALLET CONNECT (EIP-1193 / injected providers e.g. MetaMask) ----------------
+  let currentAccount = null;
+
+  function shortAddr(addr) {
+    return addr.slice(0, 6) + '…' + addr.slice(-4);
+  }
+
+  function setWalletUI(addr) {
+    currentAccount = addr;
+    const navBtns = [document.getElementById('walletBtnNav'), document.getElementById('walletBtnHero')];
+    const pill = document.getElementById('walletPill');
+    const pillText = document.getElementById('walletPillText');
+    const inlineBtn = document.getElementById('walletConnectInline');
+    const walletField = document.getElementById('fWallet');
+
+    if (addr) {
+      navBtns.forEach(b => { b.textContent = shortAddr(addr); b.classList.add('connected'); });
+      pill.classList.add('connected');
+      pillText.textContent = 'Connected: ' + shortAddr(addr);
+      inlineBtn.textContent = 'Disconnect';
+      walletField.value = addr;
+      walletField.disabled = true;
+    } else {
+      navBtns.forEach(b => { b.textContent = 'Connect Wallet'; b.classList.remove('connected'); });
+      pill.classList.remove('connected');
+      pillText.textContent = 'No wallet connected';
+      inlineBtn.textContent = 'Connect';
+      walletField.disabled = false;
+    }
+  }
+
+  async function connectWallet() {
+    if (typeof window.ethereum === 'undefined') {
+      alert('No Ethereum wallet detected. Install MetaMask or another injected wallet, or use a WalletConnect-compatible mobile wallet browser.');
+      return;
+    }
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      if (accounts && accounts[0]) setWalletUI(accounts[0]);
+    } catch (err) {
+      console.error('wallet connect failed', err);
+    }
+  }
+
+  function disconnectWallet() {
+    // Injected providers (MetaMask) do not expose a true programmatic
+    // "disconnect" -- this clears local app state only. The wallet extension
+    // itself remains connected until the user revokes it from the wallet UI.
+    setWalletUI(null);
+  }
+
+  function toggleWallet() {
+    if (currentAccount) disconnectWallet(); else connectWallet();
+  }
+
+  document.getElementById('walletBtnNav').addEventListener('click', toggleWallet);
+  document.getElementById('walletBtnHero').addEventListener('click', toggleWallet);
+  document.getElementById('walletConnectInline').addEventListener('click', toggleWallet);
+
+  if (typeof window.ethereum !== 'undefined') {
+    window.ethereum.on && window.ethereum.on('accountsChanged', (accounts) => {
+      setWalletUI(accounts && accounts[0] ? accounts[0] : null);
+    });
+    // Restore an already-authorized connection without prompting.
+    window.ethereum.request({ method: 'eth_accounts' })
+      .then(accounts => { if (accounts && accounts[0]) setWalletUI(accounts[0]); })
+      .catch(() => {});
+  }
+
+  // ---------------- GTD APPLICATION SUBMISSION ----------------
+  const gtdSubmit = document.getElementById('gtdSubmit');
+  const gtdError = document.getElementById('gtdError');
+
+  function showError(msg) {
+    gtdError.textContent = msg;
+    gtdError.classList.add('show');
+  }
+  function clearError() {
+    gtdError.classList.remove('show');
+    gtdError.textContent = '';
+  }
+
+  // ---------------- FALLBACK: direct-to-Google-Forms submission ----------------
+  // Used only if the Worker request fails at the network level (e.g. "Load
+  // failed" / "Failed to fetch" on some networks or browsers). A classic
+  // hidden-form POST to Google Forms isn't subject to the CORS restrictions
+  // that fetch() is, so it goes through even when the Worker call can't.
+  // Trade-off: this path can't confirm success from Google, and can't check
+  // the server-side duplicate list -- it uses a same-browser localStorage
+  // marker as a best-effort duplicate guard instead of the Worker's KV.
+  const FALLBACK_FORM_ID = "1FAIpQLSf2aIitAATqMT9b8p4RYvSiao-FfM3E2WojTbEUyYo_T6_oNw";
+  const FALLBACK_ENTRY_X = "entry.2047122748";
+  const FALLBACK_ENTRY_WALLET = "entry.1457108902";
+  const FALLBACK_ENTRY_LIKE_RT = "entry.2098374744";
+
+  function submitViaHiddenFormFallback(xHandle, wallet, likeRt) {
+    return new Promise((resolve) => {
+      let iframe = document.getElementById('evmsHiddenSubmitFrame');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.name = 'evmsHiddenSubmitFrame';
+        iframe.id = 'evmsHiddenSubmitFrame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+      const form = document.createElement('form');
+      form.action = `https://docs.google.com/forms/d/e/${FALLBACK_FORM_ID}/formResponse`;
+      form.method = 'POST';
+      form.target = 'evmsHiddenSubmitFrame';
+      form.style.display = 'none';
+
+      const fields = {
+        [FALLBACK_ENTRY_X]: xHandle,
+        [FALLBACK_ENTRY_WALLET]: wallet,
+        [FALLBACK_ENTRY_LIKE_RT]: likeRt,
+      };
+      for (const [name, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      }
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(() => { form.remove(); resolve(true); }, 600);
+    });
+  }
+
+  gtdSubmit.addEventListener('click', async () => {
+    clearError();
+    const xHandle = document.getElementById('fX').value.trim();
+    const wallet = document.getElementById('fWallet').value.trim();
+    const likeRt = document.getElementById('fLink').value.trim();
+
+    if (!xHandle) return showError('Enter your X handle.');
+    if (!/^0x[a-fA-F0-9]{40}$/.test(wallet)) return showError('Enter a valid EVM wallet address (connect your wallet to autofill).');
+    if (!/^https?:\/\//.test(likeRt)) return showError('Enter a valid like/repost link.');
+
+    const localDedupeKey = 'evms_applied_' + wallet.toLowerCase();
+    if (localStorage.getItem(localDedupeKey)) {
+      return showError('This wallet already submitted an application from this browser.');
+    }
+
+    gtdSubmit.disabled = true;
+    gtdSubmit.textContent = 'Submitting…';
+
+    const showSuccess = () => {
+      document.getElementById('gtdForm').style.display = 'none';
+      document.getElementById('successBox').classList.add('show');
+      document.getElementById('successWallet').textContent = shortAddr(wallet);
+    };
+
+    let res;
+    try {
+      // Primary path: the Cloudflare Worker (real duplicate check via KV,
+      // real confirmation from Google Forms before reporting success).
+      res = await fetch(CONFIG.workerEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ xHandle, wallet, likeRt }),
+      });
+    } catch (networkErr) {
+      // The Worker request failed at the network level -- fall back to a
+      // direct submission so the application isn't lost. This path cannot
+      // confirm delivery the way the Worker path can.
+      console.error('Worker unreachable, using fallback submission:', networkErr);
+      await submitViaHiddenFormFallback(xHandle, wallet, likeRt);
+      localStorage.setItem(localDedupeKey, '1');
+      showSuccess();
+      return;
+    }
+
+    let data = null;
+    try { data = await res.clone().json(); } catch (e) {}
+
+    if (res.status === 409) {
+      showError('This wallet already submitted an application.');
+      gtdSubmit.disabled = false;
+      gtdSubmit.textContent = 'Apply for GTD';
+      return;
+    }
+    if (!res.ok) {
+      const detail = data ? (data.error || '') + (data.debug ? ' — ' + data.debug : '') : ('HTTP ' + res.status);
+      showError('Backend error: ' + (detail || 'Worker responded with ' + res.status));
+      gtdSubmit.disabled = false;
+      gtdSubmit.textContent = 'Apply for GTD';
+      return;
+    }
+
+    localStorage.setItem(localDedupeKey, '1');
+    showSuccess();
+  });
+
+})();
+</script>
+
+</body>
+</html>
